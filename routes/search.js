@@ -21,7 +21,6 @@ router.post("/search", async function (req, res) {
         data.geojson.type === "MultiPolygon" || data.geojson.type === "Polygon"
       );
     });
-    console.log(position, JSON.stringify(polygonCords[0].geojson.type));
     res.send({ position, polygonCords });
   } catch (err) {
     console.log(err);

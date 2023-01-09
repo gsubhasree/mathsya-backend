@@ -1,22 +1,15 @@
-var express = require("express");
-var router = express.Router();
-var bcrypt = require("bcrypt");
+const express = require("express");
+const router = express.Router();
+const bcrypt = require("bcrypt");
 const passport = require("passport");
 var User = require("../models/User");
-// const blockchain = require('../utils/blockchain');
+const blockchain = require("../utils/blockchain");
 
 router.post("/register", async function (req, res, next) {
   const { email, name, password } = req.body;
-  // if (role === 'User') {
-  //     await blockchain.enrollUser(email);
-  // } else if (role === 'Moderator') {
-  //     await blockchain.enrollModerator(email);
-  // } else if (role === 'Administrator') {
-  //     await blockchain.enrollAdministrator(email);
-  // } else {
-  //     return res.status(400).json({message: 'Invalid role'});
-  // }
+
   try {
+    await blockchain.enrollUser(email);
     const user = await User.findOne({ email: email });
     if (user) {
       res.status(409).json({ message: "User already exists" });
