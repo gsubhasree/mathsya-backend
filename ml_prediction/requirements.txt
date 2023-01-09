@@ -1,0 +1,16 @@
+Click
+Flask
+gunicorn
+html5lib
+itsdangerous
+Jinja2
+MarkupSafe
+Werkzeug
+numpy
+pillow
+python-dateutil
+scikit-image
+scikit-learn
+scipy
+seaborn
+

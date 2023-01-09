@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>ADD</title>
+    <style>
+	body{
+		background-color:#eeeeee;
+		margin:0px;
+		padding:0px;
+	}
+	#header{
+		background-color:white;
+	}
+	h1{
+		font-weight:bold;
+		color:black;
+		text-align:center;
+		margin:0;
+
+	}
+	h3{
+		font-weight:bold;
+		font-size:30px;
+		text-align:center;
+		color:black;
+	}
+	#description{
+		font-weight:bold;
+		font-size:25px;
+		font-style:italic;
+		color:blue;
+		text-align:center;
+	}
+	.form-control {
+		height: 30px;
+		padding: 6px 12px;
+		line-height: 1.42857143;
+		color: #555;
+		background-color: #fff;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+	}
+	.box{
+		text-align: center;
+		background-color:white;
+		border:solid #777777 3px;
+		border-radius:20px;
+		font-weight:bold;
+		font-size:20px;
+		width:60%;
+		margin:0 auto;
+		display: flex;
+		justify-content: center;
+		color:#000080;
+		padding:20px;
+	}
+	button{
+		cursor:pointer;
+	}
+	p{
+		min-width:400px;
+	}
+	input,select{
+		width: 100%;
+		padding: 12px 20px;
+		margin: 8px 0;
+		box-sizing: border-box;
+	}
+	button {
+		width:90px;
+		color: #fff;
+		background-color: #007bff;
+		border-color: #007bff;
+		display: inline-block;
+		font-weight: 400;
+		text-align: center;
+		white-space: nowrap;
+		vertical-align: middle;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		border: 1px solid transparent;
+		padding: .375rem .75rem;
+		font-size: 1rem;
+		line-height: 1.5;
+		border-radius: .25rem;
+		transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	}
+	footer {
+		text-align: center;
+		width:100%;
+		position:fixed;
+		left:50%;
+		bottom:0%;
+		transform:translateX(-50%);
+		background-color:#eeeeee;
+		color:blue;
+	}
+   </style>
+	
+</head>
+
+<body>
+	<div id='header'><h1>ML Classifier</h1>
+        <p id='description'>Web app for classification models on multiple Datasets</p>
+		<footer>by G.Subhasree</footer>
+    </div>
+
+	<h3>ADD data</h3>
+	<div class='box'>
+	<form action="{{ url_for('append')}}" method="post">
+		{%for x in range(rows): %}
+			<p>
+				<h5>Data {{x+1}}</h5>
+				{%for x in options%}
+				<input type="text" name="{{x}}[]" placeholder="{{x}}" required="required"/><br/>
+				{%endfor%} 
+				<select id="role" name="{{type}}[]">
+					<option value="" disabled selected>Select {{type}}</option>
+					{%for x in types%}
+					<option value="{{x}}">{{x}}</option>
+					{%endfor%} 
+				</select>
+			</p>
+			<hr/>
+		{%endfor%}
+		<button type="submit">GO</button>
+	</form>
+	</div>
+	<footer id="myfooter">by   G.Subhasree</footer>
+</body>
+</html>

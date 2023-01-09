@@ -1,0 +1,268 @@
+ <!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>ML Classifier</title>
+  <style>
+    body{
+        background-color:#eeeeee;
+        margin:0px;
+        padding:0px;
+        text-align:center;
+        font-size:20px;
+        color:black;
+    }
+    #header{
+        background-color:white;
+        padding:20px;
+    }
+    .options{
+        margin:10px;
+    }
+    h1{
+        margin:0;
+        font-weight:bold;
+        color:black;
+        text-align:center;
+    }
+    #description{
+        font-weight:bold;
+        font-size:25px;
+        font-style:italic;
+        color:blue;
+        text-align:center;
+    }
+    img {
+		width: 100%;
+		height: auto;
+	}
+    .form-control {
+        height: 30px;
+        padding: 6px 12px;
+        line-height: 1.42857143;
+        color: #555;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        max-width:90%;
+    }
+    .box{
+        text-align: center;
+        background-color:white;
+        border:solid black 3px;
+        border-radius:10px;
+        font-weight:bold;
+        font-size:20px;
+        width:50%;
+        margin:0 auto;
+        display: flex;
+        justify-content: center;
+        color:#000080;
+        padding:25px;
+    }
+    button{
+        cursor:pointer;
+    }
+    #row,#db{
+        display: none;
+    }
+    #training{
+        display: none;
+    }
+    #predict{
+        display: none;
+    }
+    .menu{
+        min-width:250px;
+        height:50px;
+        margin:20px;
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+        display: inline-block;
+        font-weight: 400;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        user-select: none;
+        border: 1px solid transparent;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: .25rem;
+    }
+    .outbox,.outbox1{
+        position:relative;
+        color:Black;
+        background-color:white;
+        padding:20px;
+        width:90%;
+        left:50%;
+        transform:translateX(-50%);
+        border-radius:20px;
+        margin:20px;
+    }
+    .outbox1{
+        margin-top:20px;
+        padding:5px;
+        width:450px;
+        background-color:#47a0bd;
+        color:white;
+        border-radius:10px;
+    }
+	footer {
+		text-align: center;
+		width:100%;
+		position:fixed;
+		left:50%;
+		bottom:0%;
+		transform:translateX(-50%);
+		background-color:#eeeeee;
+		color:blue;
+	}
+  </style>
+</head>
+<body>
+    <div id='header'><h1>ML Classifier</h1>
+        <p id='description'>Web app for classification models on multiple Datasets</p>
+    </div>
+    {%if response:%}
+    <div class='outbox1'>
+    <p>
+        <b>{{response}}</b><br>
+		{%if model_choice=='decisiontree' and img!="null" %}
+         <a href="{{img}}" >Display Decision Tree</a>
+		{%endif%}
+    </p>
+    </div>
+    {%endif%}
+    <div style="padding-top:20px;">
+        <form action="{{ url_for('dbchange')}}" id= "dbchangeform" method="post">
+            <select class="form-control" id="dbchange" style="width:280px; height:60px; font-size:larger; text-transform:uppercase;" name="db_choice">
+                {%for x in db_choices%}
+                    {%if x == current_choice :%}<option value="{{x}}" selected>{{x}}</option>
+                    {%else :%} <option value="{{x}}" >{{x}}</option>
+                    {%endif%}
+                {%endfor%}
+            </select>
+        </form>
+    </div>
+    <div class='options'>
+        <button class='menu' onclick="adddb()" style="background-color:black;">Add new csv</button>
+        <button class='menu' onclick="norow()" style="background-color:red;">Add Data   +</button>
+        <button class='menu' onclick="train()" style="background-color:orange;">Train the current data</button>
+        <button class='menu' onclick="prediction()" style="background-color:green;">Test the current model built</button>
+		<form action="{{ url_for('view')}}" method="post"><button class='menu' style="background-color:blue;">View Dataset</button></form>
+    </div>
+    <div class='box' id='row'> 
+        <form action="{{ url_for('add')}}" method="post">
+            <label>No of rows:</label>
+            <input type="number" name="noc" min="1">
+            <button class="add-input" type="submit">GO</button>
+        </form>
+    </div>
+    <div class='box' id='training'>
+        <form action="{{ url_for('train')}}" method="post">
+            <div class="input-field">
+                <select class="form-control" name="model_choice">
+                    <option value="" disabled selected>Select Model</option>
+					<option value="LogisticRegression">Logistic Regression</option>
+                    <option value="decisiontree">Decision Tree</option>
+                    <option value="KNN">K-Nearest Neighbour</option>
+					<option value="SVM">SVM</option>
+					<option value="RandomForest">Random Forest</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-block btn-large">Train</button>
+            </div>  
+        </form>
+    </div>
+    <div class='box' id='db'> 
+        <form action="{{ url_for('upload')}}" method="post" enctype = "multipart/form-data">
+			<input type = "file" name = "file" />
+			<input type = "submit"/>
+		</form>
+    </div>
+    <div class='box' id='predict'>
+      <form action="{{ url_for('predict')}}"method="post">
+        <div class="input-field">
+            {%for x in options%}
+            <p>{{x}} : <input class="form-control" type="text" name="{{x}}"  required="required"/></p>
+            {%endfor%}     
+            <select class="form-control" name="model_choice">
+                <option value="" disabled selected>Select Model</option>
+				<option value="LogisticRegression">Logistic Regression</option>
+                <option value="decisiontree">Decision Tree</option>
+                <option value="KNN">K-Nearest Neighbour</option>
+				<option value="SVM">SVM</option>
+				<option value="RandomForest">Random Forest</option>
+            </select>
+        </div>
+ 
+        <button type="submit">Predict</button>
+      </form>
+ 
+ </div>
+    <p>
+    <b>Informations about dataset:</b>
+    {{info}}
+    </p>
+    {%if features:%}
+    <div class='outbox'>
+    <p>
+        <b>Inputs:</b>
+        {{features}}
+    </p>
+    {%endif%}
+    
+    {%if prediction_text:%}
+    <p>
+        <b>Predicted Class:</b>
+        {{ prediction_text }}
+    </p>
+    </div>
+    {%endif%}
+    <footer id="myfooter">by   G.Subhasree</footer>    
+    <script>
+        function norow(){
+            document.querySelector("#row").style.display="block";
+            document.querySelector("#training").style.display="none";
+            document.querySelector("#predict").style.display="none";
+            document.querySelector("#db").style.display="none";
+        }
+        function train(){
+            document.querySelector("#training").style.display="block";
+            document.querySelector("#row").style.display="none";
+            document.querySelector("#predict").style.display="none";
+            document.querySelector("#db").style.display="none";
+        }
+        function prediction(){
+            document.querySelector("#training").style.display="none";
+            document.querySelector("#row").style.display="none";
+            document.querySelector("#predict").style.display="block";
+            document.querySelector("#db").style.display="none";
+        }
+        function adddb(){
+            document.querySelector("#training").style.display="none";
+            document.querySelector("#row").style.display="none";
+            document.querySelector("#predict").style.display="none";
+            document.querySelector("#db").style.display="block";
+        }
+        {%if model_choice=='decisiontree'%}
+            localStorage.setItem("dtree",`{{data}}`)
+        {%endif%}
+        {%if model_choice=='knnmodel'%}
+            localStorage.setItem("knn",`{{data}}`)
+        {%endif%}
+
+        document.getElementById("dbchange").onchange = (e)=>{
+            document.getElementById("dbchangeform").submit();
+            document.querySelector("#training").style.display="none";
+            document.querySelector("#row").style.display="none";
+            document.querySelector("#predict").style.display="none";
+            document.querySelector("#db").style.display="none";
+        }
+
+	</script>
+</body>
+</html>
