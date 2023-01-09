@@ -23,6 +23,8 @@ var redisStore = require("connect-redis")(session);
 
 var indexRouter = require("./routes/index");
 var authRouter = require("./routes/auth");
+var searchRouter = require("./routes/search");
+var getClimateRouter = require("./routes/getClimate");
 
 const passport = require("passport");
 
@@ -54,6 +56,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 require("./utils/passport")(passport);
 
+app.use("/climate", getClimateRouter);
+app.use("/globalfence", searchRouter);
 app.use("/auth", authRouter);
 app.use("/", indexRouter);
 
