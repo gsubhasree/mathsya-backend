@@ -1,0 +1,73 @@
+var express = require("express");
+var router = express.Router();
+var bcrypt = require("bcrypt");
+const passport = require("passport");
+var User = require("../models/User");
+// const blockchain = require('../utils/blockchain');
+
+router.post("/register", async function (req, res, next) {
+  const { email, name, password } = req.body;
+  // if (role === 'User') {
+  //     await blockchain.enrollUser(email);
+  // } else if (role === 'Moderator') {
+  //     await blockchain.enrollModerator(email);
+  // } else if (role === 'Administrator') {
+  //     await blockchain.enrollAdministrator(email);
+  // } else {
+  //     return res.status(400).json({message: 'Invalid role'});
+  // }
+  try {
+    const user = await User.findOne({ email: email });
+    if (user) {
+      res.status(409).json({ message: "User already exists" });
+    } else {
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(password, salt);
+
+      const newUser = new User({
+        email: email,
+        name: name,
+        password: hash,
+      });
+      await newUser.save();
+      res.status(201).json({ message: "User created" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Error registering user" });
+  }
+});
+
+router.post("/login", async function (req, res, next) {
+  passport.authenticate("local", function (err, user, info) {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({ message: "Incorrect email or password" });
+    }
+    req.logIn(user, function (err) {
+      if (err) {
+        return next(err);
+      }
+      return res.status(200).json({ message: "User logged in" });
+    });
+  })(req, res, next);
+});
+
+router.get("/user", async function (req, res) {
+  try {
+    res.send(req.user);
+  } catch (err) {
+    res.status(500).send({ message: "Error getting user" });
+  }
+});
+
+router.get("/logout", function (req, res, next) {
+  req.logout(function (err) {
+    if (err) return next(err);
+    res.status(200).json({ message: "User logged out" });
+  });
+});
+
+module.exports = router;
