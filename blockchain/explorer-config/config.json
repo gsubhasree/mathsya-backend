@@ -1,0 +1,9 @@
+{
+	"network-configs": {
+		"mathsya": {
+			"name": "mathsya",
+			"profile": "/opt/explorer/app/platform/fabric/connection-profile/mathsya.json"
+		}
+	},
+	"license": "Apache-2.0"
+}

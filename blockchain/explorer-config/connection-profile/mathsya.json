@@ -1,0 +1,82 @@
+{
+	"name": "mathsya",
+	"version": "1.0",
+	"client": {
+		"tlsEnable": true,
+		"adminCredential": {
+			"id": "admin",
+			"password": "adminpw"
+		},
+		"enableAuthentication": true,
+		"organization": "Administration",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"documentchannel": {
+			"peers": {
+				"peer0.administration.mathsya.tech": {},
+				"peer0.stakeholders.mathsya.tech": {}
+			},
+			"connection": {
+				"timeout": {
+					"peer": {
+						"endorser": "6000",
+						"eventHub": "6000",
+						"eventReg": "6000"
+					}
+				}
+			}
+		}
+	},
+	"organizations": {
+		"Administration": {
+			"mspid": "AdministrationMSP",
+			"adminPrivateKey": {
+				"path": "/tmp/crypto/peerOrganizations/administration.mathsya.tech/users/Admin@administration.mathsya.tech/msp/keystore/priv_sk"
+			},
+			"peers": ["peer0.administration.mathsya.tech"],
+			"signedCert": {
+				"path": "/tmp/crypto/peerOrganizations/administration.mathsya.tech/users/Admin@administration.mathsya.tech/msp/signcerts/cert.pem"
+			}
+		},
+		"Stakeholders": {
+			"mspid": "StakeholdersMSP",
+			"adminPrivateKey": {
+				"path": "/tmp/crypto/peerOrganizations/stakeholders.mathsya.tech/users/Admin@stakeholders.mathsya.tech/msp/keystore/priv_sk"
+			},
+			"peers": ["peer0.stakeholders.mathsya.tech"],
+			"signedCert": {
+				"path": "/tmp/crypto/peerOrganizations/stakeholders.mathsya.tech/users/Admin@stakeholders.mathsya.tech/msp/signcerts/cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"peer0.administration.mathsya.tech": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peerOrganizations/administration.mathsya.tech/peers/peer0.administration.mathsya.tech/tls/ca.crt"
+			},
+			"url": "grpcs://peer0.administration.mathsya.tech:7051"
+		},
+		"peer0.stakeholders.mathsya.tech": {
+			"tlsCACerts": {
+				"path": "/tmp/crypto/peerOrganizations/stakeholders.mathsya.tech/peers/peer0.stakeholders.mathsya.tech/tls/ca.crt"
+			},
+			"url": "grpcs://peer0.stakeholders.mathsya.tech:9051"
+		}
+	},
+	"orderers": {
+		"orderer.mathsya.tech": {
+		    "tlsCACerts": {
+				"path": "/tmp/crypto/ordererOrganizations/mathsya.tech/orderers/orderer.mathsya.tech/tls/ca.crt"
+			},
+		  "url": "grpcs://orderer.mathsya.tech:7050"
+		}
+	}
+}
