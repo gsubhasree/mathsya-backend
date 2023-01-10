@@ -6,6 +6,7 @@ require("dotenv").config();
 var session = require("express-session");
 var cors = require("cors");
 const redisClient = require("./utils/redis");
+const { consumer } = require("./kafka/location-consumer/index");
 
 const mongoose = require("mongoose");
 const mongoUrl = process.env.MONGO_URL;
@@ -23,13 +24,49 @@ var redisStore = require("connect-redis")(session);
 
 var indexRouter = require("./routes/index");
 var authRouter = require("./routes/auth");
+var productRouter = require("./routes/product");
+var auctionRouter = require("./routes/auction");
 var searchRouter = require("./routes/search");
 var getClimateRouter = require("./routes/getClimate");
-var getCoordinateClimateRouter = require("./routes/getCoordinateClimate")
+var getCoordinateClimateRouter = require("./routes/getCoordinateClimate");
+var predictfishRouter = require("./routes/predictfish");
 
 const passport = require("passport");
+const { processData } = require("./utils/process-consumer-data");
 
 var app = express();
+
+const httpserver = require("http").createServer(app);
+const io = require("socket.io")(httpserver, {
+  cors: {
+    origin: process.env.FRONTEND,
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("a user connected", socket.id);
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
+
+const mapOfVehicles = {};
+
+consumer
+  .on("ready", () => {
+    console.log("consumer ready..");
+    consumer.subscribe(["tracking"]);
+    consumer.consume();
+  })
+  .on("data", function (data) {
+    console.log("data received");
+    try {
+      processData(data.value.toString(), mapOfVehicles);
+    } catch (e) {
+      console.log(e);
+    }
+  });
 
 app.use(
   cors({
@@ -60,9 +97,14 @@ require("./utils/passport")(passport);
 app.use("/climate", getClimateRouter);
 app.use("/climate", getCoordinateClimateRouter);
 app.use("/globalfence", searchRouter);
+app.use("/product", productRouter);
+app.use("/predictfish", predictfishRouter);
 app.use("/auth", authRouter);
+app.use("/auction", auctionRouter);
 app.use("/", indexRouter);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server listening on port ${process.env.PORT}`);
-});
+setInterval(() => {
+  if (Object.keys(mapOfVehicles).length) io.emit("event", mapOfVehicles);
+}, 1000);
+
+module.exports = httpserver;

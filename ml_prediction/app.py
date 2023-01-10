@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from os import path
 from werkzeug.utils import secure_filename
+import json
  
 import pickle
  
@@ -25,7 +26,7 @@ def allowed_file(filename):
 @app.route('/')
 def home():  
     if str(path.exists("uploads//"+db_choices[current_choice]+"-data.pkl")) == "False":
-        df = pd.read_csv('iris.csv')
+        df = pd.read_csv('fishdata.csv')
         df.to_pickle("uploads//"+db_choices[current_choice]+"-data.pkl")
     else:
         df = pd.read_pickle("uploads//"+db_choices[current_choice]+"-data.pkl")
@@ -170,15 +171,19 @@ def predict():
     return render_template('index.html',info="Dataset has {} rows, {} columns".format(rows,cols), features='Given {} :{}'.format(list(df.columns[0:-1]),features),prediction_text='{}'.format(prediction),response="Prediction ({}) Successful".format(model_choice),model_choice=model_choice, db_choices = db_choices, current_choice = db_choices[current_choice], options = df.columns[0:-1],img=treeimg )
 
 @app.route('/predictjson',methods=['POST'])
-def predict():
+def predictjson():
     df = pd.read_pickle("uploads//"+db_choices[current_choice]+"-data.pkl")
     rows=len(df)
     cols=len(df.columns)
-    model_choice = request.form['model_choice']
+    data = json.loads(request.data)
+    print(data, type(data))
+    model_choice = data['model_choise']
+    print(model_choice)
     features = []
     treeimg=""
     for x in df.columns[0:-1]:
-        features.append(request.form[x])
+        features.append(data[x.lower()])
+    print(features)
     final_features = [np.array(features)]
 
     if model_choice == 'decisiontree':
