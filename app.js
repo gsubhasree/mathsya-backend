@@ -25,6 +25,7 @@ var indexRouter = require("./routes/index");
 var authRouter = require("./routes/auth");
 var searchRouter = require("./routes/search");
 var getClimateRouter = require("./routes/getClimate");
+var getCoordinateClimateRouter = require("./routes/getCoordinateClimate")
 
 const passport = require("passport");
 
@@ -57,6 +58,7 @@ app.use(passport.session());
 require("./utils/passport")(passport);
 
 app.use("/climate", getClimateRouter);
+app.use("/climate", getCoordinateClimateRouter);
 app.use("/globalfence", searchRouter);
 app.use("/auth", authRouter);
 app.use("/", indexRouter);
