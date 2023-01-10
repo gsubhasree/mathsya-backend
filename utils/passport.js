@@ -37,7 +37,7 @@ module.exports = function (passport) {
     try {
       const user = await User.findOne({ email: email });
       if (user) {
-        done(null, { email: user.email, name: user.name});
+        done(null, user);
       }
     } catch (err) {
       console.log(err);
